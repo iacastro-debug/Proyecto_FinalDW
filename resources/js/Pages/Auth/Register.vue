@@ -9,12 +9,18 @@ defineOptions({
   layout: null
 })
 
-// Estado del formulario
+const roles = [
+  { label: 'Administrador', value: 'admin' },
+  { label: 'Médico', value: 'medico' },
+  { label: 'Paciente', value: 'paciente' },
+]
+
 const state = reactive({
   name: '',
   email: '',
   password: '',
-  password_confirmation: ''
+  password_confirmation: '',
+  role: ''
 })
 
 // Obtener errores de validación del backend
@@ -109,6 +115,16 @@ const handleSubmit = () => {
               class="w-full"
             />
           </FormField>
+
+          <UFormGroup label="Tipo de usuario" name="role" required :error="errors.role">
+            <USelect
+              v-model="state.role"
+              :items="roles"
+              placeholder="Selecciona tu rol..."
+              size="xl"
+              class="w-full"
+            />
+          </UFormGroup>
 
           <UButton
             type="submit"
