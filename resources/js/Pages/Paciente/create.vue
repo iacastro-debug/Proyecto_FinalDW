@@ -5,8 +5,9 @@ import { route } from 'ziggy-js'
 
 const form = reactive({
   name: '', email: '', password: '', password_confirmation: '',
-  tipo_documento: 'DNI', numero_documento: '', telefono: '',
-  direccion: '', fecha_nacimiento: '', genero: ''
+  tipo_documento: 'DNI', numero_documento: '', fecha_nacimiento: '',
+  telefono: '', direccion: '', grupo_sanguineo: '', alergias: '',
+  contacto_emergencia_nombre: '', contacto_emergencia_telefono: ''
 })
 const loading = ref(false)
 const submit = () => { loading.value = true; router.post(route('pacientes.store'), form, { onFinish: () => loading.value = false }) }
@@ -25,8 +26,8 @@ const submit = () => { loading.value = true; router.post(route('pacientes.store'
                 <UInput v-model="form.name" placeholder="Ej: Juan Carlos Pérez López" />
               </UFormGroup>
               <UFormGroup label="Correo electrónico" required>
-                <p class="text-sm text-gray-500 mb-1">Se usará como usuario para iniciar sesión</p>
-                <UInput v-model="form.email" type="email" placeholder="Ej: juan.perez@correo.com" />
+                <p class="text-sm text-gray-500 mb-1">Se usará para iniciar sesión en el sistema</p>
+                <UInput v-model="form.email" type="email" placeholder="Ej: jperez@correo.com" />
               </UFormGroup>
               <UFormGroup label="Contraseña" required>
                 <p class="text-sm text-gray-500 mb-1">Mínimo 8 caracteres</p>
@@ -42,27 +43,56 @@ const submit = () => { loading.value = true; router.post(route('pacientes.store'
             <template #header><h3 class="font-semibold">Datos personales</h3></template>
             <div class="space-y-4">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <UFormGroup label="Tipo de documento">
-                  <p class="text-sm text-gray-500 mb-1">DNI, Carné de Extranjería o Pasaporte</p>`n                <USelect v-model="form.tipo_documento" :items="['DNI', 'CE', 'Pasaporte']" />
+                <UFormGroup label="Tipo de documento" required>
+                  <p class="text-sm text-gray-500 mb-1">DNI, CE o Pasaporte</p>
+                  <USelect v-model="form.tipo_documento" :items="['DNI', 'CE', 'Pasaporte']" />
                 </UFormGroup>
-                <UFormGroup label="N° de documento">
-                  <p class="text-sm text-gray-500 mb-1">Ingresa el número sin guiones ni espacios</p>`n                <UInput v-model="form.numero_documento" placeholder="Ej: 12345678" />
+                <UFormGroup label="N° de documento" required>
+                  <p class="text-sm text-gray-500 mb-1">Según el tipo de documento seleccionado</p>
+                  <UInput v-model="form.numero_documento" placeholder="Ej: 12345678" />
                 </UFormGroup>
               </div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <UFormGroup label="Teléfono">
-                  <p class="text-sm text-gray-500 mb-1">Incluye código de país si es necesario</p>`n                <UInput v-model="form.telefono" placeholder="Ej: +51 999 888 777" />
-                </UFormGroup>
                 <UFormGroup label="Fecha de nacimiento">
+                  <p class="text-sm text-gray-500 mb-1">Para calcular la edad automáticamente</p>
                   <UInput v-model="form.fecha_nacimiento" type="date" />
                 </UFormGroup>
+                <UFormGroup label="Teléfono">
+                  <p class="text-sm text-gray-500 mb-1">Teléfono de contacto del paciente</p>
+                  <UInput v-model="form.telefono" placeholder="Ej: +51 999 888 777" />
+                </UFormGroup>
               </div>
-              <UFormGroup label="Género">
-                <USelect v-model="form.genero" :items="['M', 'F', 'Otro']" />
-              </UFormGroup>
               <UFormGroup label="Dirección">
-                <UTextarea v-model="form.direccion" placeholder="Ej: Av. Principal 123, Urb. Las Flores" :rows="2" />
-                <p class="text-sm text-gray-500 mt-1">Dirección de residencia actual</p>
+                <p class="text-sm text-gray-500 mb-1">Dirección de residencia actual</p>
+                <UTextarea v-model="form.direccion" placeholder="Ej: Av. Principal 123, Lima" :rows="2" />
+              </UFormGroup>
+            </div>
+          </UCard>
+
+          <UCard>
+            <template #header><h3 class="font-semibold">Información médica</h3></template>
+            <div class="space-y-4">
+              <UFormGroup label="Grupo sanguíneo">
+                <p class="text-sm text-gray-500 mb-1">Importante para emergencias</p>
+                <USelect v-model="form.grupo_sanguineo" :items="['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']" placeholder="Seleccionar..." />
+              </UFormGroup>
+              <UFormGroup label="Alergias conocidas">
+                <p class="text-sm text-gray-500 mb-1">Medicamentos, alimentos u otras sustancias</p>
+                <UTextarea v-model="form.alergias" placeholder="Ej: Penicilina, aspirina, mariscos" :rows="2" />
+              </UFormGroup>
+            </div>
+          </UCard>
+
+          <UCard>
+            <template #header><h3 class="font-semibold">Contacto de emergencia</h3></template>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <UFormGroup label="Nombre del contacto">
+                <p class="text-sm text-gray-500 mb-1">Persona a contactar en caso de emergencia</p>
+                <UInput v-model="form.contacto_emergencia_nombre" placeholder="Ej: María López" />
+              </UFormGroup>
+              <UFormGroup label="Teléfono del contacto">
+                <p class="text-sm text-gray-500 mb-1">Teléfono del contacto de emergencia</p>
+                <UInput v-model="form.contacto_emergencia_telefono" placeholder="Ej: +51 999 111 222" />
               </UFormGroup>
             </div>
           </UCard>

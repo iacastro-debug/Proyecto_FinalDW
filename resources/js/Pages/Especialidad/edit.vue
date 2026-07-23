@@ -18,11 +18,12 @@ const submit = () => { loading.value = true; router.put(route('especialidades.up
             <template #header><h3 class="font-semibold">Información de la especialidad</h3></template>
             <div class="space-y-4">
               <UFormGroup label="Nombre de la especialidad" required>
-                <p class="text-sm text-gray-500 mb-1">Ej: Cardiología, Pediatría, Traumatología</p>`n                <UInput v-model="form.nombre" placeholder="Ej: Medicina General" />
+                <p class="text-sm text-gray-500 mb-1">Ej: Cardiología, Pediatría, Traumatología</p>
+                <UInput v-model="form.nombre" placeholder="Ej: Medicina General" />
               </UFormGroup>
               <UFormGroup label="Descripción">
+                <p class="text-sm text-gray-500 mb-1">Describe brevemente el alcance de esta especialidad</p>
                 <UTextarea v-model="form.descripcion" placeholder="Ej: Atención médica integral para pacientes adultos." :rows="3" />
-                <p class="text-sm text-gray-500 mt-1">Describe brevemente el alcance de esta especialidad</p>
               </UFormGroup>
               <UFormGroup label="Estado">
                 <UCheckbox v-model="form.activo" label="Especialidad activa" />

@@ -22,10 +22,12 @@ const submit = () => { loading.value = true; router.put(route('medicos.update', 
             <template #header><h3 class="font-semibold">Datos de la cuenta</h3></template>
             <div class="space-y-4">
               <UFormGroup label="Nombre completo" required>
-                <p class="text-sm text-gray-500 mb-1">Nombres y apellidos del médico</p>`n                <UInput v-model="form.name" placeholder="Ej: Dr. Ricardo Sánchez Mendoza" />
+                <p class="text-sm text-gray-500 mb-1">Nombres y apellidos del médico</p>
+                <UInput v-model="form.name" placeholder="Ej: Dr. Ricardo Sánchez Mendoza" />
               </UFormGroup>
               <UFormGroup label="Correo electrónico" required>
-                <p class="text-sm text-gray-500 mb-1">Se usará como usuario para iniciar sesión</p>`n                <UInput v-model="form.email" type="email" placeholder="Ej: rsanchez@clinica.com" />
+                <p class="text-sm text-gray-500 mb-1">Se usará como usuario para iniciar sesión</p>
+                <UInput v-model="form.email" type="email" placeholder="Ej: rsanchez@clinica.com" />
               </UFormGroup>
             </div>
           </UCard>
@@ -34,14 +36,16 @@ const submit = () => { loading.value = true; router.put(route('medicos.update', 
             <template #header><h3 class="font-semibold">Datos profesionales</h3></template>
             <div class="space-y-4">
               <UFormGroup label="Especialidad" required>
+                <p class="text-sm text-gray-500 mb-1">Selecciona la especialidad principal del médico</p>
                 <USelect v-model="form.especialidad_id" :items="especialidades.map((e: any) => ({ label: e.nombre, value: e.id }))" placeholder="Seleccionar especialidad..." />
-                <p class="text-sm text-gray-500 mt-1">Selecciona la especialidad principal del médico</p>
               </UFormGroup>
               <UFormGroup label="N° de registro profesional">
-                <p class="text-sm text-gray-500 mb-1">CMP (Perú) o equivalente según el país</p>`n                <UInput v-model="form.numero_registro" placeholder="Ej: CMP 12345" />
+                <p class="text-sm text-gray-500 mb-1">CMP (Perú) o equivalente según el país</p>
+                <UInput v-model="form.numero_registro" placeholder="Ej: CMP 12345" />
               </UFormGroup>
               <UFormGroup label="Teléfono">
-                <p class="text-sm text-gray-500 mb-1">Teléfono de contacto profesional</p>`n                <UInput v-model="form.telefono" placeholder="Ej: +51 999 888 777" />
+                <p class="text-sm text-gray-500 mb-1">Teléfono de contacto profesional</p>
+                <UInput v-model="form.telefono" placeholder="Ej: +51 999 888 777" />
               </UFormGroup>
             </div>
           </UCard>

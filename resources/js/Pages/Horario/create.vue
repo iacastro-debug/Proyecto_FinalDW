@@ -24,22 +24,26 @@ const dias = [
             <template #header><h3 class="font-semibold">Configuración del horario</h3></template>
             <div class="space-y-4">
               <UFormGroup label="Médico" required>
+                <p class="text-sm text-gray-500 mb-1">Selecciona el médico para este horario</p>
                 <USelect v-model="form.medico_id" :items="medicos.map((m: any) => ({ label: m.user.name, value: m.id }))" placeholder="Seleccionar médico..." />
-                <p class="text-sm text-gray-500 mt-1">Selecciona el médico para este horario</p>
               </UFormGroup>
               <UFormGroup label="Día de la semana" required>
-                <p class="text-sm text-gray-500 mb-1">Día en que aplica este horario</p>`n                <USelect v-model="form.dia" :items="dias" />
+                <p class="text-sm text-gray-500 mb-1">Día en que aplica este horario</p>
+                <USelect v-model="form.dia" :items="dias" />
               </UFormGroup>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <UFormGroup label="Hora de inicio" required>
-                  <p class="text-sm text-gray-500 mb-1">Ej: 08:00 (formato 24h)</p>`n                <UInput v-model="form.hora_inicio" type="time" />
+                  <p class="text-sm text-gray-500 mb-1">Ej: 08:00 (formato 24h)</p>
+                  <UInput v-model="form.hora_inicio" type="time" />
                 </UFormGroup>
                 <UFormGroup label="Hora de fin" required>
-                  <p class="text-sm text-gray-500 mb-1">Ej: 17:00 (formato 24h)</p>`n                <UInput v-model="form.hora_fin" type="time" />
+                  <p class="text-sm text-gray-500 mb-1">Ej: 17:00 (formato 24h)</p>
+                  <UInput v-model="form.hora_fin" type="time" />
                 </UFormGroup>
               </div>
               <UFormGroup label="Intervalo entre citas (minutos)">
-                <p class="text-sm text-gray-500 mb-1">Duración de cada espacio de atención</p>`n                <UInput v-model="form.intervalo_minutos" type="number" min="5" max="120" placeholder="Ej: 30" />
+                <p class="text-sm text-gray-500 mb-1">Duración de cada espacio de atención</p>
+                <UInput v-model="form.intervalo_minutos" type="number" min="5" max="120" placeholder="Ej: 30" />
               </UFormGroup>
               <UFormGroup label="Estado">
                 <UCheckbox v-model="form.activo" label="Horario activo" />

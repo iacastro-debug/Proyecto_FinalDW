@@ -23,27 +23,30 @@ const submit = () => { loading.value = true; router.put(route('citas.update', pr
             <template #header><h3 class="font-semibold">Datos de la cita</h3></template>
             <div class="space-y-4">
               <UFormGroup label="Paciente" required>
+                <p class="text-sm text-gray-500 mb-1">Busca y selecciona el paciente que será atendido</p>
                 <USelect v-model="form.paciente_id" :items="pacientes.map((p: any) => ({ label: `${p.user.name} - ${p.numero_documento}`, value: p.id }))" placeholder="Seleccionar paciente..." />
-                <p class="text-sm text-gray-500 mt-1">Busca y selecciona el paciente que será atendido</p>
               </UFormGroup>
               <UFormGroup label="Especialidad" required>
+                <p class="text-sm text-gray-500 mb-1">Selecciona la especialidad para la consulta</p>
                 <USelect v-model="form.especialidad_id" :items="especialidades.map((e: any) => ({ label: e.nombre, value: e.id }))" placeholder="Seleccionar especialidad..." />
-                <p class="text-sm text-gray-500 mt-1">Selecciona la especialidad para la consulta</p>
               </UFormGroup>
               <UFormGroup label="Médico" required>
+                <p class="text-sm text-gray-500 mb-1">Selecciona el médico que atenderá la cita</p>
                 <USelect v-model="form.medico_id" :items="medicos.map((m: any) => ({ label: `${m.user.name} - ${m.especialidad?.nombre || ''}`, value: m.id }))" placeholder="Seleccionar médico..." />
-                <p class="text-sm text-gray-500 mt-1">Selecciona el médico que atenderá la cita</p>
               </UFormGroup>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <UFormGroup label="Fecha de la cita" required>
-                  <p class="text-sm text-gray-500 mb-1">Selecciona el día de atención</p>`n                <UInput v-model="form.fecha_cita" type="date" />
+                  <p class="text-sm text-gray-500 mb-1">Selecciona el día de atención</p>
+                  <UInput v-model="form.fecha_cita" type="date" />
                 </UFormGroup>
                 <UFormGroup label="Hora de la cita" required>
-                  <p class="text-sm text-gray-500 mb-1">Selecciona la hora de atención (formato 24h)</p>`n                <UInput v-model="form.hora_cita" type="time" />
+                  <p class="text-sm text-gray-500 mb-1">Selecciona la hora de atención (formato 24h)</p>
+                  <UInput v-model="form.hora_cita" type="time" />
                 </UFormGroup>
               </div>
               <UFormGroup label="Estado">
-                <p class="text-sm text-gray-500 mb-1">Cambia el estado según el progreso de la cita</p>`n                <USelect v-model="form.estado" :items="[
+                <p class="text-sm text-gray-500 mb-1">Cambia el estado según el progreso de la cita</p>
+                <USelect v-model="form.estado" :items="[
                   { label: 'Pendiente', value: 'pendiente' },
                   { label: 'Confirmada', value: 'confirmada' },
                   { label: 'Completada', value: 'completada' },
@@ -57,12 +60,12 @@ const submit = () => { loading.value = true; router.put(route('citas.update', pr
             <template #header><h3 class="font-semibold">Detalles de la consulta</h3></template>
             <div class="space-y-4">
               <UFormGroup label="Motivo de la consulta" required>
+                <p class="text-sm text-gray-500 mb-1">Describe brevemente el motivo de la cita</p>
                 <UTextarea v-model="form.motivo_consulta" placeholder="Ej: Control de presión arterial, dolor de cabeza persistente..." :rows="3" />
-                <p class="text-sm text-gray-500 mt-1">Describe brevemente el motivo de la cita</p>
               </UFormGroup>
               <UFormGroup label="Observaciones">
+                <p class="text-sm text-gray-500 mb-1">Información adicional relevante para la atención</p>
                 <UTextarea v-model="form.observaciones" placeholder="Ej: Paciente requiere atención preferencial..." :rows="2" />
-                <p class="text-sm text-gray-500 mt-1">Información adicional relevante para la atención</p>
               </UFormGroup>
             </div>
           </UCard>
