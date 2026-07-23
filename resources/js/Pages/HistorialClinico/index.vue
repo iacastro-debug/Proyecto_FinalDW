@@ -13,13 +13,16 @@ defineProps<{ historiales: any[] }>()
       <div class="p-4">
         <UTable :data="historiales" :columns="[
           { accessorKey: 'paciente.user.name', header: 'Paciente' },
-          { accessorKey: 'tipo_registro', header: 'Tipo' },
-          { accessorKey: 'fecha_registro', header: 'Fecha' },
+          { accessorKey: 'medico.user.name', header: 'Médico' },
           { accessorKey: 'diagnostico', header: 'Diagnóstico' },
-          { accessorKey: 'created_at', header: 'Creado' },
+          { accessorKey: 'fecha_atencion', header: 'Fecha' },
+          { accessorKey: 'created_at', header: 'Registrado' },
         ]">
           <template #cell-acciones="{ row }">
-            <UButton color="info" variant="ghost" icon="i-lucide-eye" :to="route('historiales-clinicos.show', row.original.id)" />
+            <div class="flex gap-1">
+              <UButton color="info" variant="ghost" icon="i-lucide-eye" :to="route('historiales-clinicos.show', row.original.id)" />
+              <UButton color="warning" variant="ghost" icon="i-lucide-pencil" :to="route('historiales-clinicos.edit', row.original.id)" />
+            </div>
           </template>
         </UTable>
       </div>

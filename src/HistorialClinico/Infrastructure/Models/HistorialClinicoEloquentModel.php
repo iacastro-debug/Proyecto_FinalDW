@@ -22,12 +22,14 @@ class HistorialClinicoEloquentModel extends Model
         'motivo_consulta',
         'observaciones_medicas',
         'diagnostico',
+        'medicamentos',
         'indicaciones',
         'fecha_atencion',
     ];
 
     protected $casts = [
         'fecha_atencion' => 'datetime',
+        'medicamentos' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

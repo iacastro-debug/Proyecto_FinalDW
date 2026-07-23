@@ -25,6 +25,7 @@ class HistorialClinicoResource extends JsonResource
             'motivoConsulta' => $this->motivo_consulta,
             'observacionesMedicas' => $this->observaciones_medicas,
             'diagnostico' => $this->diagnostico,
+            'medicamentos' => $this->medicamentos,
             'indicaciones' => $this->indicaciones,
             'fechaAtencion' => $this->fecha_atencion?->format('Y-m-d H:i:s'),
             'createdAt' => $this->created_at?->format('Y-m-d H:i:s'),

@@ -56,6 +56,7 @@ class HistorialClinicoController extends Controller
             'motivo_consulta' => $request->motivo_consulta,
             'observaciones_medicas' => $request->observaciones_medicas,
             'diagnostico' => $request->diagnostico,
+            'medicamentos' => $request->medicamentos,
             'indicaciones' => $request->indicaciones,
             'fecha_atencion' => now(),
         ]);
