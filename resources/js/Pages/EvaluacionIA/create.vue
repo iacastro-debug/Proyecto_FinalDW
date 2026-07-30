@@ -1,115 +1,209 @@
-<script setup lang="ts">
-import { reactive, ref } from 'vue'
-import { router } from '@inertiajs/vue3'
-import { route } from 'ziggy-js'
+<script setup>
+import { ref, reactive } from 'vue'
 
-defineProps<{ pacientes: any[] }>()
+const cargando = ref(false)
+const resultado = ref(null)
 
 const form = reactive({
-  paciente_id: '', edad: null, genero: '', sintomas_principales: '', duracion_sintomas: '',
-  nivel_dolor: 5, fiebre: false, dificultad_respirar: false, dolor_pecho: false,
-  antecedentes: '', urgencia_percibida: 'media', observaciones: ''
+  paciente: '',
+  edad: 23,
+  genero: 'Masculino',
+  sintomas: '',
+  duracion: '',
+  nivelDolor: 'Bajo',
+  fiebre: 'No',
+  respiracion: 'No',
+  pecho: 'No',
+  antecedentes: ''
 })
-const loading = ref(false)
 
-const submit = () => {
-  loading.value = true
-  router.post(route('evaluaciones-ia.store'), form, { onFinish: () => loading.value = false })
+const generarEvaluacion = () => {
+  // 1. Activar estado de carga
+  cargando.value = true
+  resultado.value = null
+
+  // 2. Simular respuesta de la IA
+  setTimeout(() => {
+    cargando.value = false
+    resultado.value = {
+      especialidad: form.sintomas.toLowerCase().includes('cabeza') ? 'Neurología / Medicina General' : 'Medicina General',
+      prioridad: (form.pecho === 'Si' || form.respiracion === 'Si') ? 'Alta' : 'Media',
+      justificacion: `Evaluación simulada para el paciente ${form.paciente || 'Registrado'} (${form.edad} años). Presenta: "${form.sintomas || 'Sin síntomas especificados'}". Se sugiere consulta médica para valoración.`
+    }
+  }, 1000)
 }
 </script>
+
 <template>
-  <UDashboardPanel>
-    <template #header><UDashboardNavbar title="Nueva Evaluación IA"><template #leading><UDashboardSidebarCollapse /></template></UDashboardNavbar></template>
-    <template #body>
-      <div class="p-6 max-w-2xl mx-auto">
-        <form @submit.prevent="submit" class="space-y-8">
-          <div class="bg-primary-50 border border-primary-200 rounded-lg p-4 text-sm text-primary-800">
-            <strong>¿Cómo funciona?</strong> Completa los síntomas del paciente y la IA analizará la información para sugerir una especialidad médica y nivel de prioridad.
-          </div>
-
-          <UCard>
-            <template #header><h3 class="font-semibold">Datos del paciente</h3></template>
-            <div class="space-y-4">
-              <UFormGroup label="Paciente" required>
-                <p class="text-sm text-gray-500 mb-1">Selecciona el paciente a evaluar</p>
-                <USelect v-model="form.paciente_id" :items="pacientes.map((p: any) => ({ label: `${p.user.name} - ${p.numero_documento}`, value: p.id }))" placeholder="Seleccionar paciente..." />
-              </UFormGroup>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <UFormGroup label="Edad">
-                  <p class="text-sm text-gray-500 mb-1">En años cumplidos. Si no ingresas, se calculará automáticamente</p>
-                  <UInput v-model="form.edad" type="number" min="0" max="150" placeholder="Ej: 35" />
-                </UFormGroup>
-                <UFormGroup label="Género">
-                  <p class="text-sm text-gray-500 mb-1">Género del paciente</p>
-                  <USelect v-model="form.genero" :items="['M', 'F', 'Otro']" placeholder="Seleccionar..." />
-                </UFormGroup>
-              </div>
-            </div>
-          </UCard>
-
-          <UCard>
-            <template #header><h3 class="font-semibold">Síntomas y signos</h3></template>
-            <div class="space-y-4">
-              <UFormGroup label="Síntomas principales" required>
-                <p class="text-sm text-gray-500 mb-1">Describe los síntomas que presenta el paciente de forma detallada</p>
-                <UTextarea v-model="form.sintomas_principales" placeholder="Ej: Dolor de cabeza intenso y persistente desde hace 3 días, acompañado de náuseas y sensibilidad a la luz. El dolor empeora con el movimiento." :rows="4" />
-              </UFormGroup>
-              <UFormGroup label="Duración de los síntomas">
-                <p class="text-sm text-gray-500 mb-1">¿Desde cuándo presenta estos síntomas?</p>
-                <UInput v-model="form.duracion_sintomas" placeholder="Ej: 3 días, 2 semanas, 1 mes" />
-              </UFormGroup>
-              <UFormGroup label="Nivel de dolor (1-10)">
-                <p class="text-sm text-gray-500 mb-1">1 = dolor leve, 10 = dolor insoportable</p>
-                <div class="flex items-center gap-3">
-                  <UInput v-model="form.nivel_dolor" type="range" min="1" max="10" class="flex-1" />
-                  <span class="text-lg font-bold w-8 text-center">{{ form.nivel_dolor }}</span>
-                </div>
-              </UFormGroup>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <UFormGroup label="Fiebre">
-                  <UCheckbox v-model="form.fiebre" label="Sí, tiene fiebre" />
-                  <p class="text-sm text-gray-500 mt-1">¿Tiene temperatura elevada?</p>
-                </UFormGroup>
-                <UFormGroup label="Dificultad respirar">
-                  <UCheckbox v-model="form.dificultad_respirar" label="Sí, dificultad" />
-                  <p class="text-sm text-gray-500 mt-1">¿Respira con dificultad?</p>
-                </UFormGroup>
-                <UFormGroup label="Dolor en el pecho">
-                  <UCheckbox v-model="form.dolor_pecho" label="Sí, dolor en el pecho" />
-                  <p class="text-sm text-gray-500 mt-1">¿Siente dolor en el pecho?</p>
-                </UFormGroup>
-              </div>
-            </div>
-          </UCard>
-
-          <UCard>
-            <template #header><h3 class="font-semibold">Información adicional</h3></template>
-            <div class="space-y-4">
-              <UFormGroup label="Antecedentes">
-                <p class="text-sm text-gray-500 mb-1">Enfermedades preexistentes, alergias, medicamentos actuales</p>
-                <UTextarea v-model="form.antecedentes" placeholder="Ej: Hipertensión controlada, alergia a la penicilina, toma Losartán 50mg/día" :rows="3" />
-              </UFormGroup>
-              <UFormGroup label="Urgencia percibida">
-                <p class="text-sm text-gray-500 mb-1">¿Qué tan urgente considera que es la atención?</p>
-                <USelect v-model="form.urgencia_percibida" :items="[
-                  { label: 'Baja - Puede esperar', value: 'baja' },
-                  { label: 'Media - Debería atenderse pronto', value: 'media' },
-                  { label: 'Alta - Requiere atención inmediata', value: 'alta' },
-                ]" />
-              </UFormGroup>
-              <UFormGroup label="Observaciones">
-                <p class="text-sm text-gray-500 mb-1">Cualquier otro dato relevante</p>
-                <UTextarea v-model="form.observaciones" placeholder="Ej: El paciente ha perdido 5 kg en el último mes sin causa aparente" :rows="2" />
-              </UFormGroup>
-            </div>
-          </UCard>
-
-          <div class="flex gap-3 justify-end">
-            <UButton label="Cancelar" variant="subtle" :to="route('evaluaciones-ia.index')" />
-            <UButton type="submit" color="primary" label="Evaluar con IA" :loading="loading" icon="i-lucide-brain" size="lg" />
-          </div>
-        </form>
+  <div class="w-full p-6 space-y-6">
+    
+    <!-- ENCABEZADO -->
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-800">Evaluación de Síntomas con IA</h1>
+        <p class="text-slate-500 text-sm">Asistente inteligente para la orientación de especialidad médica</p>
       </div>
-    </template>
-  </UDashboardPanel>
+      <a href="/evaluaciones-ia" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition-all">
+        ← Volver a la Lista
+      </a>
+    </div>
+
+    <!-- ADVERTENCIA OBLIGATORIA -->
+    <div class="p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-2xl text-amber-900 text-sm flex items-start space-x-3 shadow-sm">
+      <span class="text-xl">⚠️</span>
+      <div>
+        <strong class="font-bold">Aviso Importante:</strong>
+        <p class="mt-0.5 text-amber-800">
+          La sugerencia generada por Inteligencia Artificial no representa un diagnóstico médico ni reemplaza la atención de un profesional de salud. Ante síntomas graves, acuda a emergencia.
+        </p>
+      </div>
+    </div>
+
+    <!-- FORMULARIO PRINCIPAL -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-8">
+      
+      <!-- SECCIÓN 1: DATOS DEL PACIENTE -->
+      <div>
+        <h2 class="text-lg font-bold text-indigo-900 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
+          <span>👤</span> Sección 1: Datos del Paciente
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre del Paciente *</label>
+            <input 
+              v-model="form.paciente" 
+              type="text" 
+              placeholder="Ingrese el nombre completo" 
+              class="w-full border border-slate-200 rounded-xl px-3 py-2 text-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" 
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Edad *</label>
+            <input v-model="form.edad" type="number" placeholder="Ej. 23" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Género</label>
+            <select v-model="form.genero" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+              <option>Masculino</option>
+              <option>Femenino</option>
+              <option>Otro</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 2: SÍNTOMAS -->
+      <div>
+        <h2 class="text-lg font-bold text-indigo-900 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
+          <span>🩺</span> Sección 2: Detalle de Síntomas
+        </h2>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Síntomas Principales *</label>
+            <textarea v-model="form.sintomas" rows="3" placeholder="Ej. Dolor de cabeza intenso, fotofobia y mareo" class="w-full border border-slate-200 rounded-xl p-3 text-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Duración de Síntomas</label>
+              <input v-model="form.duracion" type="text" placeholder="Ej. 2 días" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nivel de Dolor</label>
+              <select v-model="form.nivelDolor" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                <option>Bajo</option>
+                <option>Medio</option>
+                <option>Alto</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Preguntas clave -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <span class="block text-xs font-bold text-slate-600 mb-2">¿Tiene Fiebre?</span>
+              <div class="flex gap-4 text-sm font-medium">
+                <label class="flex items-center gap-1 cursor-pointer"><input type="radio" v-model="form.fiebre" value="Si" /> Sí</label>
+                <label class="flex items-center gap-1 cursor-pointer"><input type="radio" v-model="form.fiebre" value="No" /> No</label>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <span class="block text-xs font-bold text-slate-600 mb-2">¿Dificultad para respirar?</span>
+              <div class="flex gap-4 text-sm font-medium">
+                <label class="flex items-center gap-1 cursor-pointer"><input type="radio" v-model="form.respiracion" value="Si" /> Sí</label>
+                <label class="flex items-center gap-1 cursor-pointer"><input type="radio" v-model="form.respiracion" value="No" /> No</label>
+              </div>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+              <span class="block text-xs font-bold text-slate-600 mb-2">¿Dolor en el Pecho?</span>
+              <div class="flex gap-4 text-sm font-medium">
+                <label class="flex items-center gap-1 cursor-pointer"><input type="radio" v-model="form.pecho" value="Si" /> Sí</label>
+                <label class="flex items-center gap-1 cursor-pointer"><input type="radio" v-model="form.pecho" value="No" /> No</label>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Antecedentes Relevantes / Observaciones</label>
+            <input v-model="form.antecedentes" type="text" placeholder="Ninguna" class="w-full border border-slate-200 rounded-xl px-3 py-2 text-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTÓN GENERAR CON EVENTO @CLICK -->
+      <div class="flex justify-end pt-4 border-t border-slate-100">
+        <button 
+          type="button" 
+          @click="generarEvaluacion"
+          :disabled="cargando"
+          class="px-6 py-3 bg-gradient-to-r from-teal-600 to-indigo-600 hover:from-teal-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
+        >
+          <span v-if="!cargando">✨ Generar Orientación con IA</span>
+          <span v-else class="flex items-center gap-2">🔄 Procesando evaluación...</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- RESULTADO GENERADO POR LA IA -->
+    <div v-if="resultado" class="p-6 bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl shadow-xl space-y-4 transition-all">
+      <div class="flex items-center justify-between border-b border-indigo-700/50 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">🤖</span>
+          <h3 class="text-xl font-bold">Resultado de la Orientación IA</h3>
+        </div>
+        <span class="px-3 py-1 bg-teal-500/20 text-teal-300 border border-teal-500/30 text-xs font-bold rounded-full uppercase">
+          Especialidad Recomendada
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+          <span class="text-xs text-indigo-200 uppercase font-bold block mb-1">Especialidad Sugerida</span>
+          <p class="text-2xl font-extrabold text-teal-300">{{ resultado.especialidad }}</p>
+        </div>
+        <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+          <span class="text-xs text-indigo-200 uppercase font-bold block mb-1">Nivel de Prioridad</span>
+          <p class="text-xl font-bold" :class="resultado.prioridad === 'Alta' ? 'text-amber-400' : 'text-emerald-400'">
+            {{ resultado.prioridad }}
+          </p>
+        </div>
+      </div>
+
+      <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+        <span class="text-xs text-indigo-200 uppercase font-bold block mb-1">Justificación del Análisis</span>
+        <p class="text-sm text-slate-200 leading-relaxed">{{ resultado.justificacion }}</p>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <a href="/citas/nueva" class="px-5 py-2.5 bg-teal-500 hover:bg-teal-600 font-bold text-white text-sm rounded-xl transition-all shadow">
+          📅 Agendar Cita con esta Especialidad
+        </a>
+      </div>
+    </div>
+
+  </div>
 </template>

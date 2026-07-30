@@ -17,8 +17,8 @@ const eliminar = (id: string) => { if (confirm('¿Eliminar?')) router.delete(rou
     <template #body>
       <div class="p-4">
         <UTable :data="pacientes" :columns="[
-          { accessorKey: 'user.name', header: 'Nombre' },
-          { accessorKey: 'user.email', header: 'Email' },
+          { accessorKey: 'nombres', header: 'Nombre' },
+          { accessorKey: 'email', header: 'Email' },
           { accessorKey: 'tipo_documento', header: 'Tipo Doc.' },
           { accessorKey: 'numero_documento', header: 'N° Documento' },
           { accessorKey: 'telefono', header: 'Teléfono' },
