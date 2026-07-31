@@ -17,7 +17,9 @@ const form = useForm({
   medicamentos_actuales: '',
   contacto_emergencia_nombre: '',
   contacto_emergencia_telefono: '',
-  seguro_medico: ''
+  seguro_medico: '',
+  password: '',
+  password_confirmation: ''
 })
 
 const guardar = () => {
@@ -170,7 +172,36 @@ const guardar = () => {
             </div>
           </UCard>
 
-          <!-- SECCIÓN 3: HISTORIAL MÉDICO -->
+          <!-- SECCIÓN 3: ACCESO AL SISTEMA -->
+          <UCard class="w-full shadow-sm hover:shadow-md transition-shadow border border-gray-200/80 dark:border-gray-800">
+            <template #header>
+              <div class="flex items-center gap-2.5">
+                <div class="p-2 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400">
+                  <UIcon name="i-lucide-lock" class="w-5 h-5" />
+                </div>
+                <h2 class="text-base font-bold text-gray-900 dark:text-white">Acceso al Sistema</h2>
+              </div>
+            </template>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
+                  Contraseña <span class="text-red-500">*</span>
+                </label>
+                <p class="text-sm text-gray-500 mb-1">Mínimo 6 caracteres. El paciente la usará para iniciar sesión</p>
+                <UInput v-model="form.password" type="password" icon="i-lucide-key-round" required size="md" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
+                  Confirmar Contraseña <span class="text-red-500">*</span>
+                </label>
+                <UInput v-model="form.password_confirmation" type="password" icon="i-lucide-key-round" required size="md" />
+              </div>
+            </div>
+          </UCard>
+
+          <!-- SECCIÓN 4: HISTORIAL MÉDICO -->
           <UCard class="w-full shadow-sm hover:shadow-md transition-shadow border border-gray-200/80 dark:border-gray-800">
             <template #header>
               <div class="flex items-center gap-2.5">
@@ -234,7 +265,7 @@ const guardar = () => {
             </div>
           </UCard>
 
-          <!-- SECCIÓN 4: CONTACTO DE EMERGENCIA -->
+          <!-- SECCIÓN 5: CONTACTO DE EMERGENCIA -->
           <UCard class="w-full shadow-sm hover:shadow-md transition-shadow border border-gray-200/80 dark:border-gray-800">
             <template #header>
               <div class="flex items-center gap-2.5">

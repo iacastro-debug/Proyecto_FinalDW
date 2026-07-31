@@ -15,12 +15,22 @@ class PacienteEloquentModel extends Model
     protected $fillable = [
         'id',
         'user_id',
+        'nombres',
+        'apellidos',
+        'email',
         'tipo_documento',
         'numero_documento',
         'telefono',
         'direccion',
         'fecha_nacimiento',
         'genero',
+        'grupo_sanguineo',
+        'alergias',
+        'enfermedades_cronicas',
+        'medicamentos_actuales',
+        'contacto_emergencia_nombre',
+        'contacto_emergencia_telefono',
+        'seguro_medico',
         'activo'
     ];
 
