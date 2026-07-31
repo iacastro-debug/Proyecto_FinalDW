@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { router } from '@inertiajs/vue3'
 import { route } from 'ziggy-js'
 
-const props = defineProps<{ medico: any, cita: any | null, pacientes: any[] }>()
+const props = defineProps<{ medico: any, cita: any | null, pacientes: any[], citas: any[] }>()
 
 const form = reactive({
   cita_id: props.cita?.id || '',
@@ -15,6 +15,19 @@ const form = reactive({
   indicaciones: '',
 })
 const loading = ref(false)
+
+const citasDisponibles = computed(() => props.citas.map((c: any) => ({
+  label: `${c.paciente?.user?.name || 'Paciente'} - ${c.fecha_cita} ${c.hora_cita}`,
+  value: c.id,
+})))
+
+const onCitaChange = (id: string) => {
+  const cita = props.citas.find((c: any) => c.id === id)
+  if (cita) {
+    form.paciente_id = cita.paciente_id
+    form.motivo_consulta = cita.motivo_consulta || ''
+  }
+}
 
 const addMedicamento = () => {
   form.medicamentos.push({ nombre: '', dosis: '', frecuencia: '', duracion: '' })
@@ -43,9 +56,14 @@ const submit = () => {
                 <p><strong>Motivo:</strong> {{ cita.motivo_consulta }}</p>
               </div>
 
+              <UFormGroup label="Cita de la consulta" required>
+                <p class="text-sm text-gray-500 mb-1">Selecciona la cita atendida para generar el informe</p>
+                <USelect v-model="form.cita_id" :items="citasDisponibles" placeholder="Seleccionar cita..." @update:model-value="onCitaChange" />
+              </UFormGroup>
+
               <UFormGroup v-if="!cita" label="Paciente" required>
-                <p class="text-sm text-gray-500 mb-1">Selecciona el paciente de la consulta</p>
-                <USelect v-model="form.paciente_id" :items="pacientes.map((p: any) => ({ label: `${p.user.name} - ${p.numero_documento}`, value: p.id }))" placeholder="Seleccionar paciente..." />
+                <p class="text-sm text-gray-500 mb-1">Se selecciona automáticamente según la cita</p>
+                <USelect v-model="form.paciente_id" :items="pacientes.map((p: any) => ({ label: `${p.user.name} - ${p.numero_documento}`, value: p.id }))" placeholder="Seleccionar paciente..." disabled />
               </UFormGroup>
 
               <UFormGroup label="Motivo de consulta" required>

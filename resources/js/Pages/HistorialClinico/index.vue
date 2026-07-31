@@ -7,6 +7,9 @@ defineProps<{ historiales: any[] }>()
     <template #header>
       <UDashboardNavbar title="Historial Clínico">
         <template #leading><UDashboardSidebarCollapse /></template>
+        <template #right>
+          <UButton label="Nuevo Informe" color="primary" icon="i-lucide-plus" :to="route('historiales-clinicos.create')" />
+        </template>
       </UDashboardNavbar>
     </template>
     <template #body>

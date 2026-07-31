@@ -41,32 +41,28 @@ class HistorialClinicoWebController extends Controller
         $user = auth()->user();
         $medico = MedicoEloquentModel::where('user_id', $user->id)->first();
 
-        if (!$medico) {
-            return redirect()->route('historiales-clinicos.index')
-                ->with('error', 'Solo los médicos pueden crear historiales clínicos.');
-        }
-
         $cita = null;
-        $pacientes = [];
+        $citas = CitaEloquentModel::with('paciente.user')->where('estado', '!=', 'cancelada')->get();
 
         if ($citaId) {
-            $cita = CitaEloquentModel::with('paciente.user')->findOrFail($citaId);
-            if ($cita->medico_id !== $medico->id) {
+            $cita = $citas->firstWhere('id', $citaId);
+            if ($medico && $cita && $cita->medico_id !== $medico->id) {
                 return redirect()->route('historiales-clinicos.index')
                     ->with('error', 'Esta cita no te pertenece.');
             }
-        } else {
-            $pacientes = PacienteEloquentModel::with('user')
-                ->whereHas('citas', function ($q) use ($medico) {
-                    $q->where('medico_id', $medico->id);
-                })
-                ->get();
         }
+
+        if ($medico) {
+            $citas = $citas->where('medico_id', $medico->id)->values();
+        }
+
+        $pacientes = PacienteEloquentModel::with('user')->get();
 
         return Inertia::render('HistorialClinico/create', [
             'medico' => $medico,
             'cita' => $cita,
             'pacientes' => $pacientes,
+            'citas' => $citas,
         ]);
     }
 
@@ -75,12 +71,16 @@ class HistorialClinicoWebController extends Controller
         $user = auth()->user();
         $medico = MedicoEloquentModel::where('user_id', $user->id)->first();
 
-        if (!$medico) {
-            return redirect()->route('historiales-clinicos.index')
-                ->with('error', 'Solo los médicos pueden crear historiales clínicos.');
+        $cita = CitaEloquentModel::find($request->cita_id);
+        if ($cita) {
+            $medico = MedicoEloquentModel::find($cita->medico_id);
         }
 
-        $cita = CitaEloquentModel::find($request->cita_id);
+        if (!$medico) {
+            return redirect()->route('historiales-clinicos.index')
+                ->with('error', 'No se encontró un médico para esta cita.');
+        }
+
         if ($cita) {
             $cita->update(['estado' => 'atendida']);
         }
