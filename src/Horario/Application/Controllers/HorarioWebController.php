@@ -14,7 +14,16 @@ class HorarioWebController extends Controller
 {
     public function index()
     {
-        $horarios = HorarioEloquentModel::with('medico.user')->get();
+        $query = HorarioEloquentModel::with('medico.user');
+
+        if (auth()->user()->role === 'medico') {
+            $medico = MedicoEloquentModel::where('user_id', auth()->id())->first();
+            if ($medico) {
+                $query->where('medico_id', $medico->id);
+            }
+        }
+
+        $horarios = $query->orderBy('dia')->orderBy('hora_inicio')->get();
         return Inertia::render('Horario/index', ['horarios' => $horarios]);
     }
 

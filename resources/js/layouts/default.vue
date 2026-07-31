@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { router, usePage } from '@inertiajs/vue3'
 import type { NavigationMenuItem } from '@nuxt/ui'
 import TeamsMenu from '../components/TeamsMenu.vue'
 import UserMenu from '../components/UserMenu.vue'
@@ -21,57 +21,43 @@ const navigateTo = (url: string) => {
   open.value = false
 }
 
-const links = [[{
-  label: 'Dashboard',
-  icon: 'i-lucide-house',
-  to: '/dashboard',
-  onSelect: () => navigateTo('/dashboard')
-}, {
-  label: 'Pacientes',
-  icon: 'i-lucide-users-round',
-  to: '/pacientes',
-  onSelect: () => navigateTo('/pacientes')
-}, {
-  label: 'Médicos',
-  icon: 'i-lucide-stethoscope',
-  to: '/medicos',
-  onSelect: () => navigateTo('/medicos')
-}, {
-  label: 'Especialidades',
-  icon: 'i-lucide-clipboard-list',
-  to: '/especialidades',
-  onSelect: () => navigateTo('/especialidades')
-}, {
-  label: 'Horarios',
-  icon: 'i-lucide-calendar-clock',
-  to: '/horarios',
-  onSelect: () => navigateTo('/horarios')
-}, {
-  label: 'Citas',
-  icon: 'i-lucide-calendar-check',
-  to: '/citas',
-  onSelect: () => navigateTo('/citas')
-}, {
-  label: 'Evaluación IA',
-  icon: 'i-lucide-brain',
-  to: '/evaluaciones-ia',
-  onSelect: () => navigateTo('/evaluaciones-ia')
-}, {
-  label: 'Historial Clínico',
-  icon: 'i-lucide-file-text',
-  to: '/historiales-clinicos',
-  onSelect: () => navigateTo('/historiales-clinicos')
-}, {
-  label: 'Notificaciones',
-  icon: 'i-lucide-bell',
-  to: '/notificaciones',
-  onSelect: () => navigateTo('/notificaciones')
-}]] satisfies NavigationMenuItem[][]
+const role = computed(() => (usePage().props.auth?.user?.role as string) ?? '')
+
+const navLink = (label: string, icon: string, to: string): NavigationMenuItem => ({
+  label, icon, to,
+  onSelect: () => navigateTo(to)
+})
+
+const allLinks: NavigationMenuItem[] = [
+  navLink('Dashboard', 'i-lucide-house', '/dashboard'),
+  navLink('Pacientes', 'i-lucide-users-round', '/pacientes'),
+  navLink('Médicos', 'i-lucide-stethoscope', '/medicos'),
+  navLink('Especialidades', 'i-lucide-clipboard-list', '/especialidades'),
+  navLink('Horarios', 'i-lucide-calendar-clock', '/horarios'),
+  navLink('Citas', 'i-lucide-calendar-check', '/citas'),
+  navLink('Evaluación IA', 'i-lucide-brain', '/evaluaciones-ia'),
+  navLink('Historial Clínico', 'i-lucide-file-text', '/historiales-clinicos'),
+  navLink('Notificaciones', 'i-lucide-bell', '/notificaciones')
+]
+
+const medicoLinks = allLinks.filter(l => [
+  '/dashboard', '/citas', '/horarios', '/evaluaciones-ia', '/historiales-clinicos'
+].includes(l.to))
+
+const pacienteLinks = allLinks.filter(l => [
+  '/dashboard', '/citas', '/historiales-clinicos'
+].includes(l.to))
+
+const links = computed<NavigationMenuItem[][]>(() => {
+  if (role.value === 'medico') return [medicoLinks]
+  if (role.value === 'paciente') return [pacienteLinks]
+  return [allLinks]
+})
 
 const groups = computed(() => [{
   id: 'links',
   label: 'Go to',
-  items: links.flat()
+  items: links.value.flat()
 }])
 </script>
 

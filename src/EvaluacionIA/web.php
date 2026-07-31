@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Src\EvaluacionIA\Application\Controllers\EvaluacionIAWebController;
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'role:admin,medico'])->group(function () {
     Route::get('evaluaciones-ia', [EvaluacionIAWebController::class, 'index'])->name('evaluaciones-ia.index');
     Route::get('evaluaciones-ia/crear', [EvaluacionIAWebController::class, 'create'])->name('evaluaciones-ia.create');
     Route::post('evaluaciones-ia', [EvaluacionIAWebController::class, 'store'])->name('evaluaciones-ia.store');

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, shallowRef } from 'vue'
+import { ref, shallowRef, computed } from 'vue'
+import { usePage } from '@inertiajs/vue3'
 import { sub } from 'date-fns'
 import type { DropdownMenuItem } from '@nuxt/ui'
 import type { Period, Range } from '../types'
@@ -15,6 +16,11 @@ const range = shallowRef<Range>({
   end: new Date()
 })
 const period = ref<Period>('daily')
+
+const role = computed(() => (usePage().props.auth?.user?.role as string) ?? '')
+const puedeEvaluar = computed(() => role.value === 'admin' || role.value === 'medico')
+const puedeAgendarCita = computed(() => role.value === 'admin' || role.value === 'paciente')
+const puedeRegistrarPaciente = computed(() => role.value === 'admin')
 </script>
 
 <template>
@@ -32,7 +38,8 @@ const period = ref<Period>('daily')
         </p>
       </div>
       <a 
-        href="/evaluacion-ia" 
+        v-if="puedeEvaluar"
+        href="/evaluaciones-ia/crear" 
         class="shrink-0 px-6 py-3.5 bg-white text-indigo-700 hover:bg-teal-50 font-bold rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 text-center"
       >
         🤖 Evaluar Síntomas
@@ -88,7 +95,7 @@ const period = ref<Period>('daily')
 
     <!-- 3. ACCESOS RÁPIDOS -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-      <a href="/citas/nueva" class="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-teal-500 hover:shadow-md transition-all flex items-center space-x-4">
+      <a v-if="puedeAgendarCita" href="/citas/create" class="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-teal-500 hover:shadow-md transition-all flex items-center space-x-4">
         <div class="p-3 bg-teal-500 text-white rounded-xl">📅</div>
         <div>
           <h4 class="font-bold text-slate-800">Agendar Cita Médica</h4>
@@ -96,7 +103,7 @@ const period = ref<Period>('daily')
         </div>
       </a>
 
-      <a href="/pacientes/nuevo" class="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-indigo-500 hover:shadow-md transition-all flex items-center space-x-4">
+      <a v-if="puedeRegistrarPaciente" href="/pacientes/create" class="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-indigo-500 hover:shadow-md transition-all flex items-center space-x-4">
         <div class="p-3 bg-indigo-500 text-white rounded-xl">👤</div>
         <div>
           <h4 class="font-bold text-slate-800">Registrar Paciente</h4>
@@ -104,11 +111,11 @@ const period = ref<Period>('daily')
         </div>
       </a>
 
-      <a href="/reportes" class="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-purple-500 hover:shadow-md transition-all flex items-center space-x-4">
+      <a href="/historiales-clinicos" class="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-purple-500 hover:shadow-md transition-all flex items-center space-x-4">
         <div class="p-3 bg-purple-500 text-white rounded-xl">📊</div>
         <div>
-          <h4 class="font-bold text-slate-800">Ver Reportes</h4>
-          <p class="text-xs text-slate-400">Citas y métricas de IA</p>
+          <h4 class="font-bold text-slate-800">Historial Clínico</h4>
+          <p class="text-xs text-slate-400">Informes de consulta y recetas</p>
         </div>
       </a>
     </div>

@@ -13,16 +13,37 @@ use Illuminate\Support\Str;
 
 class EvaluacionIAWebController extends Controller
 {
+    private function pacienteIdsDelMedico(): array
+    {
+        $medico = \Src\Medico\Infrastructure\Models\MedicoEloquentModel::where('user_id', auth()->id())->first();
+        if (!$medico) {
+            return [];
+        }
+        return \Src\Cita\Infrastructure\Models\CitaEloquentModel::where('medico_id', $medico->id)
+            ->pluck('paciente_id')->unique()->values()->all();
+    }
+
     public function index(): Response
     {
-        $evaluaciones = EvaluacionIAEloquentModel::with('paciente.user')->latest()->get();
+        $query = EvaluacionIAEloquentModel::with('paciente.user');
+
+        if (auth()->user()->role === 'medico') {
+            $query->whereIn('paciente_id', $this->pacienteIdsDelMedico());
+        }
+
+        $evaluaciones = $query->latest()->get();
         return Inertia::render('EvaluacionIA/index', ['evaluaciones' => $evaluaciones]);
     }
 
     public function create(): Response
     {
-        $pacientes = PacienteEloquentModel::with('user')->where('activo', true)->get();
-        return Inertia::render('EvaluacionIA/create', ['pacientes' => $pacientes]);
+        $pacientes = PacienteEloquentModel::with('user')->where('activo', true);
+
+        if (auth()->user()->role === 'medico') {
+            $pacientes = $pacientes->whereIn('id', $this->pacienteIdsDelMedico());
+        }
+
+        return Inertia::render('EvaluacionIA/create', ['pacientes' => $pacientes->get()]);
     }
 
     public function store(): RedirectResponse

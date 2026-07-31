@@ -1,5 +1,9 @@
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
+import { usePage } from '@inertiajs/vue3'
+
+const role = computed(() => usePage().props.auth?.user?.role ?? '')
+const puedeAgendarCita = computed(() => role.value === 'admin')
 
 const cargando = ref(false)
 const resultado = ref(null)
@@ -199,7 +203,7 @@ const generarEvaluacion = () => {
       </div>
 
       <div class="flex justify-end pt-2">
-        <a href="/citas/nueva" class="px-5 py-2.5 bg-teal-500 hover:bg-teal-600 font-bold text-white text-sm rounded-xl transition-all shadow">
+        <a v-if="puedeAgendarCita" href="/citas/create" class="px-5 py-2.5 bg-teal-500 hover:bg-teal-600 font-bold text-white text-sm rounded-xl transition-all shadow">
           📅 Agendar Cita con esta Especialidad
         </a>
       </div>

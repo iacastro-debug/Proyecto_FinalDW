@@ -105,6 +105,20 @@ class HistorialClinicoWebController extends Controller
     public function show(string $id)
     {
         $historial = HistorialClinicoEloquentModel::with(['paciente.user', 'medico.user', 'cita'])->findOrFail($id);
+
+        $user = auth()->user();
+        if ($user->role === 'medico') {
+            $medico = MedicoEloquentModel::where('user_id', $user->id)->first();
+            if (!$medico || $historial->medico_id !== $medico->id) {
+                abort(403, 'No tienes permisos para ver este historial.');
+            }
+        } elseif ($user->role === 'paciente') {
+            $paciente = PacienteEloquentModel::where('user_id', $user->id)->first();
+            if (!$paciente || $historial->paciente_id !== $paciente->id) {
+                abort(403, 'No tienes permisos para ver este historial.');
+            }
+        }
+
         return Inertia::render('HistorialClinico/show', ['historial' => $historial]);
     }
 
@@ -113,16 +127,13 @@ class HistorialClinicoWebController extends Controller
         $user = auth()->user();
         $medico = MedicoEloquentModel::where('user_id', $user->id)->first();
 
-        if (!$medico) {
-            return redirect()->route('historiales-clinicos.index')
-                ->with('error', 'Solo los médicos pueden editar historiales clínicos.');
-        }
-
         $historial = HistorialClinicoEloquentModel::findOrFail($id);
 
-        if ($historial->medico_id !== $medico->id) {
-            return redirect()->route('historiales-clinicos.index')
-                ->with('error', 'Solo el médico que atendió puede modificar este historial.');
+        if ($user->role === 'medico') {
+            if (!$medico || $historial->medico_id !== $medico->id) {
+                return redirect()->route('historiales-clinicos.index')
+                    ->with('error', 'Solo el médico que atendió puede modificar este historial.');
+            }
         }
 
         return Inertia::render('HistorialClinico/edit', [
@@ -136,16 +147,13 @@ class HistorialClinicoWebController extends Controller
         $user = auth()->user();
         $medico = MedicoEloquentModel::where('user_id', $user->id)->first();
 
-        if (!$medico) {
-            return redirect()->route('historiales-clinicos.index')
-                ->with('error', 'Solo los médicos pueden editar historiales clínicos.');
-        }
-
         $historial = HistorialClinicoEloquentModel::findOrFail($id);
 
-        if ($historial->medico_id !== $medico->id) {
-            return redirect()->route('historiales-clinicos.index')
-                ->with('error', 'Solo el médico que atendió puede modificar este historial.');
+        if ($user->role === 'medico') {
+            if (!$medico || $historial->medico_id !== $medico->id) {
+                return redirect()->route('historiales-clinicos.index')
+                    ->with('error', 'Solo el médico que atendió puede modificar este historial.');
+            }
         }
 
         $historial->update($request->validated());

@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { reactive, ref, computed } from 'vue'
+import { router, usePage } from '@inertiajs/vue3'
 import { route } from 'ziggy-js'
 
-defineProps<{ pacientes: any[], medicos: any[], especialidades: any[] }>()
+const props = defineProps<{ pacientes: any[], medicos: any[], especialidades: any[], pacienteActual: any | null }>()
+
+const role = computed(() => (usePage().props.auth?.user?.role as string) ?? '')
+const esPaciente = computed(() => role.value === 'paciente')
 
 const form = reactive({
-  paciente_id: '', medico_id: '', especialidad_id: '',
+  paciente_id: props.pacientes[0]?.id || '', medico_id: '', especialidad_id: '',
   fecha_cita: '', hora_cita: '', estado: 'pendiente',
   motivo_consulta: '', observaciones: ''
 })
@@ -22,7 +25,11 @@ const submit = () => { loading.value = true; router.post(route('citas.store'), f
           <UCard>
             <template #header><h3 class="font-semibold">Datos de la cita</h3></template>
             <div class="space-y-4">
-              <UFormGroup label="Paciente" required>
+              <UFormGroup v-if="esPaciente" label="Paciente" required>
+                <p class="text-sm text-gray-500 mb-1">Tú serás el paciente de esta cita</p>
+                <UInput :model-value="pacienteActual?.user?.name || 'Tú'" disabled />
+              </UFormGroup>
+              <UFormGroup v-else label="Paciente" required>
                 <p class="text-sm text-gray-500 mb-1">Busca y selecciona el paciente que será atendido</p>
                 <USelect v-model="form.paciente_id" :items="pacientes.map((p: any) => ({ label: `${p.user.name} - ${p.numero_documento}`, value: p.id }))" placeholder="Seleccionar paciente..." />
               </UFormGroup>
