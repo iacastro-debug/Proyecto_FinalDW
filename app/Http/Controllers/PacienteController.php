@@ -10,14 +10,14 @@ class PacienteController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Paciente/Index', [
+        return Inertia::render('Paciente/index', [
             'pacientes' => Paciente::latest()->get()
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('Paciente/Create');
+        return Inertia::render('Paciente/create');
     }
 
     public function store(Request $request)
@@ -36,7 +36,7 @@ class PacienteController extends Controller
         Paciente::create($request->all());
 
         // Redirigir a la vista de la tabla
-        return redirect()->route('Pacientes.index');
+        return redirect()->route('pacientes.index');
     }
 
     public function destroy($id)
@@ -44,6 +44,6 @@ class PacienteController extends Controller
         $paciente = Paciente::findOrFail($id);
         $paciente->delete();
 
-        return redirect()->route('Pacientes.index');
+        return redirect()->route('pacientes.index');
     }
 }
