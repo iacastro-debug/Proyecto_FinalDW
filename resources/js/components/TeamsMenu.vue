@@ -44,26 +44,16 @@ const items = computed<DropdownMenuItem[][]>(() => {
 </script>
 
 <template>
-  <UDropdownMenu
-    :items="items"
-    :content="{ align: 'center', collisionPadding: 12 }"
-    :ui="{ content: collapsed ? 'w-40' : 'w-(--reka-dropdown-menu-trigger-width)' }"
-  >
-    <UButton
-      v-bind="{
-        ...selectedTeam,
-        label: collapsed ? undefined : selectedTeam?.label,
-        trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down'
-      }"
-      color="neutral"
-      variant="ghost"
-      block
-      :square="collapsed"
-      class="data-[state=open]:bg-elevated"
-      :class="[!collapsed && 'py-2']"
-      :ui="{
-        trailingIcon: 'text-dimmed'
-      }"
-    />
-  </UDropdownMenu>
+  <div class="flex items-center gap-2.5 px-2 py-1.5">
+    <!-- Icono Médico -->
+    <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+      <UIcon name="i-lucide-hospital" class="w-5 h-5" />
+    </div>
+
+    <!-- Texto MEDICITA -->
+    <div v-if="!collapsed" class="flex flex-col min-w-0">
+      <span class="font-bold text-slate-800 text-sm leading-tight truncate">MEDICITA</span>
+      <span class="text-[10px] text-emerald-600 font-medium tracking-wide">Sistema Médico</span>
+    </div>
+  </div>
 </template>

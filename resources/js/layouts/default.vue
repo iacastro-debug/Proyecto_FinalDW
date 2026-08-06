@@ -73,8 +73,19 @@ const groups = computed(() => [{
         :ui="{ footer: 'lg:border-t lg:border-default' }"
       >
         <template #header="{ collapsed }">
-          <TeamsMenu :collapsed="collapsed" />
-        </template>
+           <div class="flex items-center gap-3 px-3 py-2">
+          <!-- Icono médico -->
+            <div class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-base shrink-0 shadow-sm">
+      <UIcon name="i-lucide-hospital" class="w-5 h-5 text-white" />
+      </div>
+
+    <!-- Nombre del sistema -->
+    <div v-if="!collapsed" class="flex flex-col">
+      <span class="font-bold text-slate-800 text-sm leading-none">MEDICITA</span>
+      <span class="text-[10px] text-emerald-600 font-semibold tracking-wider mt-0.5">SISTEMA MÉDICO</span>
+    </div>
+  </div>
+</template>
 
         <template #default="{ collapsed }">
           <UNavigationMenu
@@ -91,9 +102,11 @@ const groups = computed(() => [{
         </template>
       </UDashboardSidebar>
 
-      <UDashboardSearch :groups="groups" />
+      <UDashboardSearch grow />
+        <main class="flex-1 overflow-y-auto h-full p-6">
 
       <slot />
+    </main>
 
     </UDashboardGroup>
   </UApp>

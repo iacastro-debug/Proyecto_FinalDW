@@ -1,314 +1,236 @@
-<script setup lang="ts">
+<script setup>
 import { useForm } from '@inertiajs/vue3'
 
 const form = useForm({
-  email: '',
+  // Datos Generales
   nombres: '',
   apellidos: '',
   tipo_documento: 'DNI',
   numero_documento: '',
-  fecha_nacimiento: '',
-  genero: 'Masculino',
+  email: '',
   telefono: '',
   direccion: '',
+  estado: 'Activo',
+
+  // Información Médica
   grupo_sanguineo: 'O+',
+  seguro_medico: '',
   alergias: '',
   enfermedades_cronicas: '',
   medicamentos_actuales: '',
+
+  // Contacto de Emergencia
   contacto_emergencia_nombre: '',
   contacto_emergencia_telefono: '',
-  seguro_medico: '',
-  password: '',
-  password_confirmation: ''
 })
 
-const guardar = () => {
-  form.post('/pacientes', {
-    onError: (errors) => {
-      console.error('Errores al guardar:', errors)
-    }
-  })
+const submit = () => {
+  form.post('/pacientes')
 }
 </script>
 
-<template>
-  <UDashboardPanel grow class="w-full min-h-screen bg-slate-50/60 dark:bg-gray-900">
-    <!-- BARRA SUPERIOR -->
-    <template #header>
-      <UDashboardNavbar>
-        <template #leading>
-          <UButton 
-            icon="i-lucide-arrow-left" 
-            color="gray" 
-            variant="ghost" 
-            to="/pacientes"
-            label="Volver a la lista" 
-            size="sm"
-          />
-        </template>
-      </UDashboardNavbar>
-    </template>
 
-    <!-- CUERPO PRINCIPAL -->
-    <template #body>
-      <div class="w-full max-w-7xl mx-auto p-4 md:p-8 space-y-6">
-        
-        <!-- ENCABEZADO PRINCIPAL -->
-        <div class="flex items-center justify-between pb-4 border-b border-gray-200 dark:border-gray-800">
-          <div class="flex items-center gap-3">
-            <h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-              Registro General de Pacientes
-            </h1>
-            <UBadge color="primary" variant="soft" size="md">Nuevo Ficha</UBadge>
+<template>
+  <div class="max-w-6xl mx-auto space-y-6 p-2 pb-12">
+    
+    <!-- Enlace Volver y Título -->
+    <a
+      href="/pacientes"
+      class="inline-flex items-center gap-1 text-xs font-semibold text-gray-500 hover:text-emerald-600 transition cursor-pointer"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+      Volver a la lista
+    </a>
+  
+  
+      
+      <div class="flex items-center gap-3">
+        <h1 class="text-2xl font-bold text-gray-900">Registro General de Pacientes</h1>
+        <span class="px-2.5 py-0.5 text-xs font-semibold bg-emerald-100 text-emerald-700 rounded-full border border-emerald-200">
+          Nueva Ficha
+        </span>
+      </div>
+    </div>
+
+    <form @submit.prevent="submit" class="space-y-6">
+      
+      <!-- Seccion 1: Información Personal -->
+      <div class="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm space-y-4">
+        <div class="flex items-center gap-2 border-b border-gray-100 pb-3">
+          <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
           </div>
+          <h2 class="font-bold text-gray-800 text-base">Información Personal</h2>
         </div>
 
-        <form @submit.prevent="guardar" class="w-full space-y-6">
-          
-          <!-- SECCIÓN 1: DATOS PERSONALES -->
-          <UCard class="w-full shadow-sm hover:shadow-md transition-shadow border border-gray-200/80 dark:border-gray-800">
-            <template #header>
-              <div class="flex items-center gap-2.5">
-                <div class="p-2 rounded-lg bg-primary-500/10 text-primary-600 dark:text-primary-400">
-                  <UIcon name="i-lucide-user" class="w-5 h-5" />
-                </div>
-                <h2 class="text-base font-bold text-gray-900 dark:text-white">Información Personal</h2>
-              </div>
-            </template>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
-                  Nombres <span class="text-red-500">*</span>
-                </label>
-                <UInput v-model="form.nombres" icon="i-lucide-user" required size="md" />
-              </div>
-
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
-                  Apellidos <span class="text-red-500">*</span>
-                </label>
-                <UInput v-model="form.apellidos" required size="md" />
-              </div>
-
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
-                  Fecha de Nacimiento <span class="text-red-500">*</span>
-                </label>
-                <UInput v-model="form.fecha_nacimiento" type="date" required size="md" />
-              </div>
-
-              <!-- TIPO DE DOCUMENTO (DESPLEGABLE NATIVO) -->
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
-                  Tipo de Documento
-                </label>
-                <select 
-                  v-model="form.tipo_documento" 
-                  class="w-full h-[38px] px-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition"
-                >
-                  <option value="DNI">DNI</option>
-                  <option value="Pasaporte">Pasaporte</option>
-                  <option value="Carnet de Extranjería">Carnet de Extranjería</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
-                  N° de Documento <span class="text-red-500">*</span>
-                </label>
-                <UInput v-model="form.numero_documento" icon="i-lucide-id-card" required size="md" />
-              </div>
-
-              <!-- GÉNERO (DESPLEGABLE NATIVO CON TODAS LAS OPCIONES) -->
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
-                  Género
-                </label>
-                <select 
-                  v-model="form.genero" 
-                  class="w-full h-[38px] px-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition cursor-pointer"
-                >
-                  <option value="Masculino">Masculino</option>
-                  <option value="Femenino">Femenino</option>
-                  <option value="Otro">Otro</option>
-                </select>
-              </div>
-            </div>
-          </UCard>
-
-          <!-- SECCIÓN 2: CONTACTO Y UBICACIÓN -->
-          <UCard class="w-full shadow-sm hover:shadow-md transition-shadow border border-gray-200/80 dark:border-gray-800">
-            <template #header>
-              <div class="flex items-center gap-2.5">
-                <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                  <UIcon name="i-lucide-map-pin" class="w-5 h-5" />
-                </div>
-                <h2 class="text-base font-bold text-gray-900 dark:text-white">Contacto y Ubicación</h2>
-              </div>
-            </template>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
-                  Correo Electrónico <span class="text-red-500">*</span>
-                </label>
-                <UInput v-model="form.email" type="email" icon="i-lucide-mail" required size="md" />
-              </div>
-
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
-                  Teléfono / Celular
-                </label>
-                <UInput v-model="form.telefono" icon="i-lucide-phone" size="md" />
-              </div>
-
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
-                  Dirección de Domicilio
-                </label>
-                <UInput v-model="form.direccion" icon="i-lucide-home" size="md" />
-              </div>
-            </div>
-          </UCard>
-
-          <!-- SECCIÓN 3: ACCESO AL SISTEMA -->
-          <UCard class="w-full shadow-sm hover:shadow-md transition-shadow border border-gray-200/80 dark:border-gray-800">
-            <template #header>
-              <div class="flex items-center gap-2.5">
-                <div class="p-2 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400">
-                  <UIcon name="i-lucide-lock" class="w-5 h-5" />
-                </div>
-                <h2 class="text-base font-bold text-gray-900 dark:text-white">Acceso al Sistema</h2>
-              </div>
-            </template>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
-                  Contraseña <span class="text-red-500">*</span>
-                </label>
-                <p class="text-sm text-gray-500 mb-1">Mínimo 6 caracteres. El paciente la usará para iniciar sesión</p>
-                <UInput v-model="form.password" type="password" icon="i-lucide-key-round" required size="md" />
-              </div>
-
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
-                  Confirmar Contraseña <span class="text-red-500">*</span>
-                </label>
-                <UInput v-model="form.password_confirmation" type="password" icon="i-lucide-key-round" required size="md" />
-              </div>
-            </div>
-          </UCard>
-
-          <!-- SECCIÓN 4: HISTORIAL MÉDICO -->
-          <UCard class="w-full shadow-sm hover:shadow-md transition-shadow border border-gray-200/80 dark:border-gray-800">
-            <template #header>
-              <div class="flex items-center gap-2.5">
-                <div class="p-2 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400">
-                  <UIcon name="i-lucide-heart-pulse" class="w-5 h-5" />
-                </div>
-                <h2 class="text-base font-bold text-gray-900 dark:text-white">Información Médica</h2>
-              </div>
-            </template>
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-              <!-- GRUPO SANGUÍNEO (DESPLEGABLE NATIVO CON TODAS LAS OPCIONES) -->
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
-                  Grupo Sanguíneo
-                </label>
-                <select 
-                  v-model="form.grupo_sanguineo" 
-                  class="w-full h-[38px] px-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition cursor-pointer"
-                >
-                  <option value="A+">A+</option>
-                  <option value="A-">A-</option>
-                  <option value="B+">B+</option>
-                  <option value="B-">B-</option>
-                  <option value="AB+">AB+</option>
-                  <option value="AB-">AB-</option>
-                  <option value="O+">O+</option>
-                  <option value="O-">O-</option>
-                </select>
-              </div>
-
-              <div class="md:col-span-3">
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
-                  Seguro Médico
-                </label>
-                <UInput v-model="form.seguro_medico" icon="i-lucide-shield-check" size="md" />
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
-                  Alergias Conocidas
-                </label>
-                <UTextarea v-model="form.alergias" rows="3" />
-              </div>
-
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
-                  Enfermedades Crónicas
-                </label>
-                <UTextarea v-model="form.enfermedades_cronicas" rows="3" />
-              </div>
-
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
-                  Medicamentos Actuales
-                </label>
-                <UTextarea v-model="form.medicamentos_actuales" rows="3" />
-              </div>
-            </div>
-          </UCard>
-
-          <!-- SECCIÓN 5: CONTACTO DE EMERGENCIA -->
-          <UCard class="w-full shadow-sm hover:shadow-md transition-shadow border border-gray-200/80 dark:border-gray-800">
-            <template #header>
-              <div class="flex items-center gap-2.5">
-                <div class="p-2 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                  <UIcon name="i-lucide-shield-alert" class="w-5 h-5" />
-                </div>
-                <h2 class="text-base font-bold text-gray-900 dark:text-white">Contacto de Emergencia</h2>
-              </div>
-            </template>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
-                  Nombre Completo del Contacto
-                </label>
-                <UInput v-model="form.contacto_emergencia_nombre" icon="i-lucide-user-check" size="md" />
-              </div>
-
-              <div>
-                <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
-                  Teléfono de Emergencia
-                </label>
-                <UInput v-model="form.contacto_emergencia_telefono" icon="i-lucide-phone-call" size="md" />
-              </div>
-            </div>
-          </UCard>
-
-          <!-- BOTONES DE ACCIÓN -->
-          <div class="flex items-center justify-end gap-3 p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200/80 dark:border-gray-700 shadow-sm">
-            <UButton label="Cancelar" color="gray" variant="ghost" to="/pacientes" size="lg" />
-            <UButton 
-              type="submit" 
-              label="Guardar Paciente" 
-              color="primary" 
-              icon="i-lucide-check-circle"
-              size="lg" 
-              :loading="form.processing" 
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Nombres -->
+          <div>
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Nombres *</label>
+            <input 
+              v-model="form.nombres"
+              type="text" 
+              placeholder="Ej. Juan Carlos"
+              class="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+              :class="{ 'border-red-500': form.errors.nombres }"
             />
+            <span v-if="form.errors.nombres" class="text-xs text-red-500 mt-1 block">{{ form.errors.nombres }}</span>
           </div>
 
-        </form>
+          <!-- Apellidos -->
+          <div>
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Apellidos *</label>
+            <input 
+              v-model="form.apellidos"
+              type="text" 
+              placeholder="Ej. Pérez Gómez"
+              class="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+              :class="{ 'border-red-500': form.errors.apellidos }"
+            />
+            <span v-if="form.errors.apellidos" class="text-xs text-red-500 mt-1 block">{{ form.errors.apellidos }}</span>
+          </div>
 
+          <!-- Fecha de Nacimiento -->
+          <div>
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Fecha de Nacimiento *</label>
+            <input 
+              v-model="form.fecha_nacimiento"
+              type="date" 
+              class="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700 outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+              :class="{ 'border-red-500': form.errors.fecha_nacimiento }"
+            />
+            <span v-if="form.errors.fecha_nacimiento" class="text-xs text-red-500 mt-1 block">{{ form.errors.fecha_nacimiento }}</span>
+          </div>
+
+          <!-- Tipo de Documento -->
+          <div>            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Tipo de Documento *</label>
+            <select 
+              v-model="form.tipo_documento"
+              class="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700 outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+            >
+              <option value="DNI">DNI / Cédula</option>
+              <option value="PASAPORTE">Pasaporte</option>
+              <option value="CARNET_EXT">Carnet de Extranjería</option>
+            </select>
+          </div>
+
+          <!-- N° de Documento -->
+          <div>
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">N° de Documento *</label>
+            <input 
+              v-model="form.numero_documento"
+              type="text" 
+              placeholder="12345678"
+              class="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+              :class="{ 'border-red-500': form.errors.numero_documento }"
+            />
+            <span v-if="form.errors.numero_documento" class="text-xs text-red-500 mt-1 block">{{ form.errors.numero_documento }}</span>
+          </div>
+
+          <!-- Género -->
+          <div>
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Género *</label>
+            <select 
+              v-model="form.genero"
+              class="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700 outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+            >
+              <option value="Masculino">Masculino</option>
+              <option value="Femenino">Femenino</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+        </div>
       </div>
-    </template>
-  </UDashboardPanel>
+
+      <!-- Seccion 2: Contacto y Ubicación -->
+      <div class="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm space-y-4">
+        <div class="flex items-center gap-2 border-b border-gray-100 pb-3">
+          <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          </div>
+          <h2 class="font-bold text-gray-800 text-base">Contacto y Ubicación</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Correo Electrónico -->
+          <div>
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Correo Electrónico *</label>
+            <input 
+              v-model="form.email"
+              type="email" 
+              placeholder="paciente@correo.com"
+              class="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+              :class="{ 'border-red-500': form.errors.email }"
+            />
+            <span v-if="form.errors.email" class="text-xs text-red-500 mt-1 block">{{ form.errors.email }}</span>
+          </div>
+
+          <!-- Teléfono -->
+          <div>
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Teléfono / Celular *</label>
+            <input 
+              v-model="form.telefono"
+              type="text" 
+              placeholder="+51 987 654 321"
+              class="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+              :class="{ 'border-red-500': form.errors.telefono }"
+            />
+            <span v-if="form.errors.telefono" class="text-xs text-red-500 mt-1 block">{{ form.errors.telefono }}</span>
+          </div>
+
+          <!-- Dirección -->
+          <div>
+            <label class="block text-xs font-bold text-gray-600 uppercase mb-1">Dirección de Domicilio</label>
+            <input 
+              v-model="form.direccion"
+              type="text" 
+              placeholder="Av. Las Flores #123"
+              class="w-full px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección 3: Estado y Guardado -->
+<div class="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+  <div class="flex items-center gap-3 w-full sm:w-auto">
+    <label class="text-xs font-bold text-gray-600 uppercase">Estado del Paciente:</label>
+    <select
+      v-model="form.estado"
+      class="py-1.5 px-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 outline-none focus:ring-2 focus:ring-emerald-500"
+    >
+      <option value="Activo">Activo</option>
+      <option value="Inactivo">Inactivo</option>
+    </select>
+  </div>
+
+  <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+    <!-- 1. CAMBIADO: Ahora es un <button type="button"> que ejecuta volver() -->
+       <a
+        href="/pacientes"
+        class="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 rounded-xl transition cursor-pointer inline-block text-center"
+      >
+         Cancelar
+      </a> 
+    
+
+    <!-- 2. Mantenemos el botón de guardar tal como lo tenías -->
+    <button
+      type="submit"
+      :disabled="form.processing"
+      class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl shadow-sm transition active:scale-95 disabled:opacity-50 cursor-pointer"
+
+      >
+      {{ form.processing ? 'Guardando...' : 'Guardar Paciente' }}
+    </button>
+  </div>
+</div>
+    </form>
 </template>

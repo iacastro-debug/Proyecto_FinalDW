@@ -1,33 +1,45 @@
-<script setup lang="ts">
-import { useForm } from '@inertiajs/vue3'
+<script setup>
+import { useForm, Link, router } from '@inertiajs/vue3'
 
-const props = defineProps<{ paciente: any }>()
 
-const form = useForm({
-  email: props.paciente.email,
-  nombres: props.paciente.nombres,
-  apellidos: props.paciente.apellidos,
-  tipo_documento: props.paciente.tipo_documento || 'DNI',
-  numero_documento: props.paciente.numero_documento,
-  fecha_nacimiento: props.paciente.fecha_nacimiento || '',
-  genero: props.paciente.genero || 'Masculino',
-  telefono: props.paciente.telefono || '',
-  direccion: props.paciente.direccion || '',
-  grupo_sanguineo: props.paciente.grupo_sanguineo || 'O+',
-  alergias: props.paciente.alergias || '',
-  enfermedades_cronicas: props.paciente.enfermedades_cronicas || '',
-  medicamentos_actuales: props.paciente.medicamentos_actuales || '',
-  contacto_emergencia_nombre: props.paciente.contacto_emergencia_nombre || '',
-  contacto_emergencia_telefono: props.paciente.contacto_emergencia_telefono || '',
-  seguro_medico: props.paciente.seguro_medico || ''
+const props = defineProps({
+  paciente: {
+    type: Object,
+    required: true
+  }
 })
 
-const actualizar = () => {
-  form.put(`/pacientes/${props.paciente.id}`, {
-    onError: (errors) => {
-      console.error('Errores al actualizar:', errors)
-    }
-  })
+const irAPacientes = () => {
+  router.visit('/pacientes')
+}
+
+const form = useForm({
+  // Se intenta tomar del objeto principal o de la relación user
+  nombres: props.paciente?.nombres || props.paciente?.user?.name || '',
+  apellidos: props.paciente?.apellidos || '',
+  tipo_documento: props.paciente?.tipo_documento || 'DNI',
+  numero_documento: props.paciente?.numero_documento || '',
+  email: props.paciente?.email || props.paciente?.user?.email || '',
+  telefono: props.paciente?.telefono || '',
+  direccion: props.paciente?.direccion || '',
+  estado: props.paciente?.estado || 'Activo',
+
+  // Información Médica
+  grupo_sanguineo: props.paciente?.grupo_sanguineo || 'O+',
+  seguro_medico: props.paciente?.seguro_medico || '',
+  alergias: props.paciente?.alergias || '',
+  enfermedades_cronicas: props.paciente?.enfermedades_cronicas || '',
+  medicamentos_actuales: props.paciente?.medicamentos_actuales || '',
+
+  // Contacto de Emergencia
+  contacto_emergencia_nombre: props.paciente?.contacto_emergencia_nombre || '',
+  contacto_emergencia_telefono: props.paciente?.contacto_emergencia_telefono || '',
+})
+
+
+const submit = () => {
+  const id = props.paciente?.id || props.paciente?.uuid
+  form.put(`/pacientes/${id}`)
 }
 </script>
 
@@ -35,16 +47,18 @@ const actualizar = () => {
   <UDashboardPanel grow class="w-full min-h-screen bg-slate-50/60 dark:bg-gray-900">
     <template #header>
       <UDashboardNavbar>
-        <template #leading>
-          <UButton
-            icon="i-lucide-arrow-left"
-            color="gray"
-            variant="ghost"
-            to="/pacientes"
-            label="Volver a la lista"
-            size="sm"
-          />
-        </template>
+      <template #leading>
+         <UButton
+          type="button"
+          icon="i-lucide-arrow-left"
+          color="gray"
+          variant="ghost"
+          label="Volver a la lista"
+          size="sm"
+          @click="irAPacientes"
+        />
+      </template>
+        
       </UDashboardNavbar>
     </template>
 
@@ -59,7 +73,8 @@ const actualizar = () => {
           </div>
         </div>
 
-        <form @submit.prevent="actualizar" class="w-full space-y-6">
+            
+          <form @submit.prevent="submit" class="w-full space-y-6">
           <UCard class="w-full shadow-sm hover:shadow-md transition-shadow border border-gray-200/80 dark:border-gray-800">
             <template #header>
               <div class="flex items-center gap-2.5">
@@ -206,21 +221,21 @@ const actualizar = () => {
                 <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
                   Alergias Conocidas
                 </label>
-                <UTextarea v-model="form.alergias" rows="3" />
+                <UTextarea v-model="form.alergias" :rows="3" />
               </div>
 
               <div>
                 <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
                   Enfermedades Crónicas
                 </label>
-                <UTextarea v-model="form.enfermedades_cronicas" rows="3" />
+                <UTextarea v-model="form.enfermedades_cronicas" :rows="3" />
               </div>
 
               <div>
                 <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-gray-700 dark:text-gray-300">
                   Medicamentos Actuales
                 </label>
-                <UTextarea v-model="form.medicamentos_actuales" rows="3" />
+                <UTextarea v-model="form.medicamentos_actuales" :rows="3" />
               </div>
             </div>
           </UCard>
@@ -253,16 +268,27 @@ const actualizar = () => {
           </UCard>
 
           <div class="flex items-center justify-end gap-3 p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200/80 dark:border-gray-700 shadow-sm">
-            <UButton label="Cancelar" color="gray" variant="ghost" to="/pacientes" size="lg" />
-            <UButton
-              type="submit"
-              label="Actualizar Paciente"
-              color="primary"
-              icon="i-lucide-check-circle"
-              size="lg"
-              :loading="form.processing"
-            />
-          </div>
+  
+  <UButton
+    type="button"
+    label="Cancelar"
+    color="gray"
+    variant="ghost"
+    size="lg"
+    @click="irAPacientes"
+  />
+
+  <UButton
+    type="submit"
+    label="Actualizar Paciente"
+    color="primary"
+    icon="i-lucide-check-circle"
+    size="lg"
+    :loading="form.processing"
+  />
+
+</div>
+
         </form>
       </div>
     </template>

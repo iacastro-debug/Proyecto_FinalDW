@@ -44,4 +44,7 @@ class Paciente extends Model
     {
         return $this->belongsTo(UserEloquentModel::class, 'user_id');
     }
+
+   
+
 }
