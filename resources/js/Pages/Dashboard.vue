@@ -31,7 +31,7 @@ const proximasCitas = [
         
         <!-- Lado Izquierdo: Textos -->
         <div class="space-y-2">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-xs font-semibold text-emerald-100 border border-white/10">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-xs font-semibold text-emerald-100 border border-white/20">
             <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
             Módulo de Inteligencia Artificial
           </span>
@@ -45,10 +45,10 @@ const proximasCitas = [
 
         <!-- Lado Derecho: Botón Único -->
         <div>
-            <Link 
-              href="/evaluacion-ia" 
-              class="inline-flex items-center gap-2 bg-white text-emerald-900 px-5 py-2.5 rounded-xl font-bold shadow-md hover:bg-emerald-50 transition-colors shrink-0"
-            >
+          <Link
+            href="/evaluacion-ia"
+            class="inline-flex items-center gap-2 bg-white text-emerald-900 px-5 py-2.5 rounded-xl font-bold shadow-md hover:bg-emerald-50 transition"
+          >
             Evaluar Síntomas
           </Link>
         </div>
@@ -58,6 +58,7 @@ const proximasCitas = [
 
     <!-- TARJETAS DE ESTADÍSTICAS -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
       <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
         <div>
           <p class="text-xs font-bold text-gray-400 uppercase">Pacientes Registrados</p>
@@ -97,6 +98,7 @@ const proximasCitas = [
           <OhVueIcon name="fa-user-plus" class="w-5 h-5" />
         </div>
       </div>
+
     </div>
 
     <!-- SECCIÓN INFERIOR: TABLA Y ACCIONES RÁPIDAS -->
@@ -146,6 +148,7 @@ const proximasCitas = [
         <h3 class="text-xl font-bold text-gray-900 mb-4">Acciones Rápidas</h3>
 
         <div class="space-y-3">
+          
           <Link href="/citas/crear" class="group flex items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-100/80 rounded-xl border border-gray-100 transition">
             <div class="flex items-center gap-4">
               <div class="w-12 h-12 bg-[#00B074] rounded-xl flex items-center justify-center text-white shadow-sm">
@@ -184,6 +187,7 @@ const proximasCitas = [
             </div>
             <OhVueIcon name="fa-chevron-right" class="w-4 h-4 text-gray-400 group-hover:translate-x-1 transition" />
           </Link>
+
         </div>
       </div>
 

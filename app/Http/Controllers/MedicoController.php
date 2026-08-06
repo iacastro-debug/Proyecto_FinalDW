@@ -27,12 +27,12 @@ class MedicoController extends Controller
     {
         // Validamos lo que llega desde Vue
         $validated = $request->validate([
-            'name'             => 'required|string|max:255',
-            'email'            => 'required|email|unique:medicos,email',
-            'especialidad'     => 'required|string',
-            'numero_registro'  => 'nullable|string|max:100',
-            'telefono'         => 'required|string|max:20',
-            'estado'           => 'required|in:activo,inactivo',
+            'name'            => 'required|string|max:255',
+            'email'           => 'required|email|unique:medicos,email',
+            'especialidad'    => 'required|string',
+            'numero_registro' => 'nullable|string|max:100',
+            'telefono'        => 'required|string|max:20',
+            'estado'          => 'required|in:activo,inactivo',
         ]);
 
         // Separamos el campo "name" en "nombre" y "apellido"
@@ -40,8 +40,8 @@ class MedicoController extends Controller
         $nombre = $partesNombre[0];
         $apellido = $partesNombre[1] ?? '';
 
-        // Creamos el médico usando las columnas exactas de tu $fillable
-        Medico::create([
+        // Creamos el médico asignando el resultado a la variable $medico
+        $medico = Medico::create([
             'nombre'          => $nombre,
             'apellido'        => $apellido,
             'especialidad'    => $request->especialidad,
@@ -50,6 +50,9 @@ class MedicoController extends Controller
             'numero_registro' => $request->numero_registro,
             'estado'          => $request->estado,
         ]);
+
+        // Asignamos el rol de Spatie al nuevo registro
+        $medico->assignRole('Medico');
 
         return redirect()->route('medicos.index')->with('success', 'Médico registrado exitosamente.');
     }

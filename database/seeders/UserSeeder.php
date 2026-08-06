@@ -3,24 +3,49 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Src\Auth\Infrastructure\Models\UserEloquentModel;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        UserEloquentModel::firstOrCreate(
-            ['email' => 'admin@medicita.com'],
+        $password = Hash::make('12345678');
+
+        // 1. ADMINISTRADOR
+        $admin = User::firstOrCreate(
+            ['email' => 'isaac@gmail.com'],
             [
-                'id' => Str::uuid()->toString(),
-                'name' => 'Administrador',
-                'email' => 'admin@medicita.com',
-                'password' => Hash::make('admin123'),
-                'role' => 'admin',
-                'activo' => true,
+                'name'     => 'Administrador Sistema',
+                'password' => Hash::make('bianca2007'), // <--- Encriptada y entre comillas
             ]
         );
+        // 2. RECEPCIONISTA
+        $recepcionista = User::firstOrCreate(
+            ['email' => 'amalia@medicita.com'],
+            [
+                'name' => 'María Recepción', 
+                'password' => Hash::make('amalia2006'),
+            ]
+        );
+        
+        // 3. MÉDICO
+        $medico = User::firstOrCreate(
+            ['email' => 'medico@medicita.com'],
+            [
+                'name' => 'Dr. Carlos Mendoza', 
+                'password' => Hash::make('medico07'),
+            ]
+        );
+       
+        // 4. PACIENTE
+        $paciente = User::firstOrCreate(
+            ['email' => 'paciente@medicita.com'],
+            [
+                'name' => 'Juan Paciente', 
+                'password' => Hash::make('paciente07'),
+            ]
+        );
+        
     }
 }
