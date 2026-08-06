@@ -4,7 +4,7 @@ namespace Src\Auth\Domain\Enums;
 
 enum Role: string
 {
-    case Admin = 'admin';
+    case Admin = 'administrador';
     case Recepcionista = 'recepcionista';
     case Medico = 'medico';
     case Paciente = 'paciente';

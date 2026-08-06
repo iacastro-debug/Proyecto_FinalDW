@@ -1,79 +1,88 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { router, usePage } from '@inertiajs/vue3'
-import type { NavigationMenuItem } from '@nuxt/ui'
-import TeamsMenu from '../components/TeamsMenu.vue'
-import UserMenu from '../components/UserMenu.vue'
-import { useAppConfig } from '../composables/useAppConfig'
-import { useFlash } from '../composables/useFlash'
+import { computed, ref } from 'vue'
+import { usePage, router } from '@inertiajs/vue3'
 
-const open = ref(false)
-const appConfig = useAppConfig()
+const page = usePage()
+const open = ref(true)
 
-onMounted(() => {
-  console.log('Layout mounted with colors:', appConfig.value.ui.colors)
-  useFlash()
+// Datos del usuario logueado
+const user = computed(() => page.props.auth?.user || {})
+
+// Normalizamos el rol del usuario a minúsculas
+const userRole = computed(() => {
+  const role = user.value?.role || ''
+  return String(role)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
 })
 
-const navigateTo = (url: string) => {
-  router.visit(url)
-  open.value = false
+// Función para cerrar sesión
+const logout = () => {
+  router.post('/logout')
 }
 
-const navLink = (label: string, icon: string, to: string): NavigationMenuItem => ({
-  label,
-  icon,
-  to,
-  onSelect: () => navigateTo(to)
-})
-
-// MÓDULOS DE ADMINISTRADOR SEGÚN TU REQUERIMIENTO (11.1)
-const adminLinks: NavigationMenuItem[] = [
-  navLink('Dashboard', 'i-lucide-house', '/dashboard'),
-  navLink('Usuarios y Roles', 'i-lucide-shield-check', '/usuarios'),
-  navLink('Especialidades', 'i-lucide-clipboard-list', '/especialidades'),
-  navLink('Médicos', 'i-lucide-stethoscope', '/medicos'),
-  navLink('Horarios', 'i-lucide-calendar-clock', '/horarios'),
-  navLink('Reportes', 'i-lucide-bar-chart-3', '/reportes'),
+// 1. Enlaces para Administrador
+const adminLinks = [
+  { label: 'Dashboard', icon: 'i-lucide-home', to: '/dashboard' },
+  { label: 'Usuarios y Roles', icon: 'i-lucide-users', to: '/admin/usuarios' },
+  { label: 'Especialidades', icon: 'i-lucide-briefcase', to: '/specialties' },
+  { label: 'Médicos', icon: 'i-lucide-stethoscope', to: '/doctors' },
+  { label: 'Horarios', icon: 'i-lucide-calendar', to: '/schedules' },
+  { label: 'Reportes', icon: 'i-lucide-bar-chart-3', to: '/reports' },
 ]
 
-// MÓDULOS DE MÉDICO
-const medicoLinks: NavigationMenuItem[] = [
-  navLink('Dashboard', 'i-lucide-house', '/dashboard'),
-  navLink('Citas', 'i-lucide-calendar-check', '/citas'),
-  navLink('Horarios', 'i-lucide-calendar-clock', '/horarios'),
-  navLink('Evaluación IA', 'i-lucide-brain', '/evaluaciones-ia'),
-  navLink('Historial Clínico', 'i-lucide-file-text', '/historiales-clinicos'),
+// 2. Enlaces para Recepcionista
+const recepcionistaLinks = [
+  { label: 'Dashboard', icon: 'i-lucide-home', to: '/dashboard' },
+  { label: 'Registra pacientes', icon: 'i-lucide-user-plus', to: '/patients' },
+  { label: 'Agenda citas', icon: 'i-lucide-calendar', to: '/appointments' },
+  { label: 'Reprograma citas', icon: 'i-lucide-calendar-range', to: '/appointments/reschedule' },
+  { label: 'Consulta disponibilidad de médicos', icon: 'i-lucide-clock', to: '/doctors/availability' },
+  { label: 'Confirma asistencia', icon: 'i-lucide-check-circle', to: '/attendance' },
 ]
 
-// MÓDULOS DE PACIENTE
-const pacienteLinks: NavigationMenuItem[] = [
-  navLink('Dashboard', 'i-lucide-house', '/dashboard'),
-  navLink('Citas', 'i-lucide-calendar-check', '/citas'),
-  navLink('Evaluación IA', 'i-lucide-brain', '/evaluaciones-ia'),
-  navLink('Historial Clínico', 'i-lucide-file-text', '/historiales-clinicos'),
-  navLink('Notificaciones', 'i-lucide-bell', '/notificaciones'),
+// 3. Enlaces para Médico
+const medicoLinks = [
+  { label: 'Dashboard', icon: 'i-lucide-home', to: '/dashboard' },
+  { label: 'Consulta citas asignadas', icon: 'i-lucide-calendar-check', to: '/doctor/appointments' },
+  { label: 'Revisa síntomas ingresados', icon: 'i-lucide-brain', to: '/doctor/symptoms' },
+  { label: 'Registra historial clínico', icon: 'i-lucide-file-text', to: '/doctor/medical-history' },
+  { label: 'Marca citas como atendidas', icon: 'i-lucide-check-square', to: '/doctor/appointments/complete' },
+  { label: 'Consulta historial de sus pacientes atendidos', icon: 'i-lucide-users', to: '/doctor/patients' },
 ]
 
-const role = computed(() => {
-  const pageProps = usePage().props as any
-  const userRole = pageProps.auth?.user?.role
-  
-  // Muestra en la consola (F12) qué rol está recibiendo realmente
-  console.log('Rol detectado en Vue:', userRole)
+// 4. Enlaces para Paciente
+const pacienteLinks = [
+  { label: 'Dashboard', icon: 'i-lucide-home', to: '/dashboard' },
+  { label: 'Registra o actualiza sus datos', icon: 'i-lucide-user', to: '/patient/profile' },
+  { label: 'Ingresa síntomas en el módulo IA', icon: 'i-lucide-bot', to: '/patient/ai-symptoms' },
+  { label: 'Agenda citas', icon: 'i-lucide-calendar-plus', to: '/patient/book' },
+  { label: 'Consulta citas propias', icon: 'i-lucide-calendar', to: '/patient/my-appointments' },
+  { label: 'Consulta historial autorizado', icon: 'i-lucide-folder-heart', to: '/patient/history' },
+  { label: 'Cancela o reprograma citas', icon: 'i-lucide-calendar-x', to: '/patient/appointments/manage' },
+]
 
-  return userRole ? String(userRole).toLowerCase().trim() : ''
-})
+// Selección dinámica del menú
+const links = computed(() => {
+  const role = userRole.value
 
-// 2. Reemplaza la constante links
-const links = computed<NavigationMenuItem[]>(() => {
+  if (role === 'recepcionista' || role === 'recep') {
+    return recepcionistaLinks
+  }
+  if (role === 'medico' || role === 'doctor') {
+    return medicoLinks
+  }
+  if (role === 'paciente') {
+    return pacienteLinks
+  }
   return adminLinks
-
 })
 </script>
 
 <template>
-  <UApp :primary="appConfig.ui.colors.primary" :neutral="appConfig.ui.colors.neutral">
+  <UApp>
     <UDashboardGroup unit="rem">
       <UDashboardSidebar
         id="default"
@@ -88,7 +97,6 @@ const links = computed<NavigationMenuItem[]>(() => {
             <div class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-base shrink-0 shadow-sm">
               <UIcon name="i-lucide-hospital" class="w-5 h-5 text-white" />
             </div>
-
             <div v-if="!collapsed" class="flex flex-col">
               <span class="font-bold text-slate-800 text-sm leading-none">MEDICITA</span>
               <span class="text-[10px] text-emerald-600 font-semibold tracking-wider mt-0.5">SISTEMA MÉDICO</span>
@@ -107,7 +115,28 @@ const links = computed<NavigationMenuItem[]>(() => {
         </template>
 
         <template #footer="{ collapsed }">
-          <UserMenu :collapsed="collapsed" />
+          <div class="flex items-center justify-between gap-2 p-2 w-full overflow-hidden">
+            <div class="flex items-center gap-2 min-w-0">
+              <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0">
+                {{ user?.name ? user.name.charAt(0).toUpperCase() : 'U' }}
+              </div>
+              <div v-if="!collapsed" class="flex flex-col truncate">
+                <span class="text-xs font-semibold text-slate-700 truncate">{{ user?.name || 'Usuario' }}</span>
+                <span class="text-[10px] text-slate-500 capitalize">{{ user?.role || 'Rol' }}</span>
+              </div>
+            </div>
+
+            <!-- Botón de Cerrar Sesión -->
+            <button
+              v-if="!collapsed"
+              @click="logout"
+              type="button"
+              title="Cerrar sesión"
+              class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0"
+            >
+              <UIcon name="i-lucide-log-out" class="w-4 h-4" />
+            </button>
+          </div>
         </template>
       </UDashboardSidebar>
 

@@ -35,16 +35,13 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        return [
-            ...parent::share($request),
+        return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user() ? [
                     'id' => $request->user()->id,
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
-                    'role' => is_object($request->user()->role) 
-                         ? $request->user()->role->value 
-                        : $request->user()->role,
+                    'role' => $request->user()->getRoleNames()->first() ?? $request->user()->role ?? 'Administrador',
                 ] : null,
             ],
             'flash' => [
@@ -55,6 +52,6 @@ class HandleInertiaRequests extends Middleware
                 ...\Illuminate\Support\Facades\Route::current() ? (new \Tighten\Ziggy\Ziggy)->toArray() : [],
                 'location' => $request->url(),
             ],
-        ];
+        ]);
     }
 }

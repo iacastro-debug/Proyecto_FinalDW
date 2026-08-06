@@ -73,17 +73,31 @@ class EloquentUserRepository implements UserRepositoryInterface
     }
 
     private function toDomain(UserEloquentModel $model): User
-    {
-        return new User(
-            name: $model->name,
-            email: $model->email,
-            password: $model->password,
-            role: Role::from($model->role ?? 'paciente'),
-            activo: $model->activo ?? true,
-            id: $model->id,
-            emailVerifiedAt: $model->email_verified_at ? new DateTimeImmutable($model->email_verified_at->toDateTimeString()) : null,
-            createdAt: $model->created_at ? new DateTimeImmutable($model->created_at->toDateTimeString()) : null,
-            updatedAt: $model->updated_at ? new DateTimeImmutable($model->updated_at->toDateTimeString()) : null
-        );
-    }
+{
+    // Normalizamos el rol a minúsculas para comparar de forma segura
+    $rawRole = strtolower(trim($model->role ?? 'paciente'));
+
+    // Buscamos la equivalencia en la Enum Role
+    $roleString = match ($rawRole) {
+        'administrador', 'admin' => 'administrador', // Cambia por 'admin' si tu enum usa 'admin'
+        'recepcionista', 'recep' => 'recepcionista',
+        'medico', 'doctor'      => 'medico',
+        'paciente'              => 'paciente',
+        default                 => $rawRole,
+    };
+
+    $role = Role::tryFrom($roleString) ?? Role::from('paciente');
+
+    return new User(
+        name: $model->name,
+        email: $model->email,
+        password: $model->password,
+        role: $role,
+        activo: $model->activo ?? true,
+        id: $model->id,
+        emailVerifiedAt: $model->email_verified_at ? new DateTimeImmutable($model->email_verified_at->toDateTimeString()) : null,
+        createdAt: $model->created_at ? new DateTimeImmutable($model->created_at->toDateTimeString()) : null,
+        updatedAt: $model->updated_at ? new DateTimeImmutable($model->updated_at->toDateTimeString()) : null
+    );
+}
 }
